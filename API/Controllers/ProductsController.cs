@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using INFRASTRUCTURE.Data;
 using CORE.Entities;
+using CORE.Interfaces;
 
 namespace API.Controllers
 {
@@ -13,24 +14,26 @@ namespace API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly StoreContext _context;
+        private readonly IProductRepository _repo;
 
-        public ProductsController(StoreContext context)
+        public ProductsController(IProductRepository productRepository)
         {
-            _context = context;
+            _repo = productRepository;
         }
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            var products =  await _repo.GetProductsAsync();
+            return Ok(products);
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _repo.GetProductByIdAsync(id);
 
             if (product == null)
             {
@@ -40,65 +43,93 @@ namespace API.Controllers
             return product;
         }
 
-        // PUT: api/Products/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+
+        // GET: brands
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
         {
-            if (id != product.ProductId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(product).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var productBrands = await _repo.GetProductBrandsAsync();
+            return Ok(productBrands);
         }
 
-        // POST: api/Products
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
-        {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
+        // GET: types
+        [HttpGet("types")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductTypes()
+        {
+            var productTypes = await _repo.GetProductBrandsAsync();
+            return Ok(productTypes);
         }
 
-        // DELETE: api/Products/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(int id)
+
+
+        // GET: api/Products
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
-            return product;
+            var products = await _repo.GetProductBrandAsync(id);
+            return Ok(products);
         }
 
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.ProductId == id);
-        }
+        //// PUT: api/Products/5
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutProduct(int id, Product product)
+        //{
+        //    if (id != product.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(product).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ProductExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
+        //// POST: api/Products
+        //[HttpPost]
+        //public async Task<ActionResult<Product>> PostProduct(Product product)
+        //{
+        //    _context.Products.Add(product);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
+        //}
+
+        //// DELETE: api/Products/5
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult<Product>> DeleteProduct(int id)
+        //{
+        //    var product = await _context.Products.FindAsync(id);
+        //    if (product == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.Products.Remove(product);
+        //    await _context.SaveChangesAsync();
+
+        //    return product;
+        //}
+
+        //private bool ProductExists(int id)
+        //{
+        //    return _context.Products.Any(e => e.ProductId == id);
+        //}
     }
 }

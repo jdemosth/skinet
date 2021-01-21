@@ -8,6 +8,11 @@
     <ProjectReference Include="..\CORE\CORE.csproj" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.6" />
+    <PackageReference Include="System.Text.Json" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\SeedData\" />
   </ItemGroup>
 
 </Project>
